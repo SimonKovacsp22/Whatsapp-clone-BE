@@ -1,4 +1,5 @@
 import mongoose from "mongoose" 
+import { v2 as cloudinary} from "cloudinary"
  export interface User {
 	name: string
 	email: string
@@ -29,3 +30,5 @@ import mongoose from "mongoose"
  export type TokenPayload = {
     _id: mongoose.ObjectId
 }
+
+export interface ParamsFoler extends cloudinary.

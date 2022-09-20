@@ -5,7 +5,9 @@ import mongoose from "mongoose";
 import cors from "cors";
 import { Server } from "socket.io";
 import userRouter from "./apis/users/routes";
+import chatRouter from "./apis/users/chats/routes";
 import { badRequestHandler, forbiddenErrorHandler, genericServerErrorHandler, notFoundHandler, unauthorizedHandler } from "./lib/errorHandlers";
+import messagesRouter from "./apis/users/messages/routes";
 
 const port = process.env.PORT || 3001;
 
@@ -18,6 +20,8 @@ expressServer.use(cors());
 expressServer.use(express.json())
 
 expressServer.use("/users", userRouter)
+expressServer.use("/chat", chatRouter)
+expressServer.use("/messages", messagesRouter)
 
 expressServer.use(badRequestHandler)
 expressServer.use(unauthorizedHandler)

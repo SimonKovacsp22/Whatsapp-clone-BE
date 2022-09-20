@@ -44,11 +44,7 @@ export const sendNewTokens: RequestHandler = async (req, res, next) => {
   } catch (error) {}
 };
 
-export const updateUser: RequestHandler = async (
-  req: IUserRequest,
-  res,
-  next
-) => {
+export const updateUser: RequestHandler = async ( req: IUserRequest, res, next) => {
   try {
     const updatedUser = await UserModel.findByIdAndUpdate(req.user?._id, req.body, {
       new: true,
@@ -67,10 +63,13 @@ export const updateUser: RequestHandler = async (
 
 export const addAvatar: RequestHandler = async (req: IUserRequest, res, next) => {
   try {
+    console.log(req.file)
       const user = await UserModel.findByIdAndUpdate(req.user?._id,{ avatar: req.file?.path}, {new:true, runValidators:true})
 
       if (!user) {
          next(createHttpError(404, `Post with id: ${req.params.postId} not found`)) }
+
+         res.send(user)
   } catch (error) {
     next(error)
   }
