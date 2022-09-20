@@ -1,105 +1,118 @@
-import { RequestHandler } from "express"
-import UserModel from "./model"
-import { IUserRequest } from '../../lib/JWTMiddleware'
-import createHttpError from "http-errors"
+import { RequestHandler } from "express";
+import UserModel from "./model";
+import { IUserRequest } from "../../lib/JWTMiddleware";
+import createHttpError from "http-errors";
+import { createAccessToken } from "../../lib/tokens";
 
-export const registerUser: RequestHandler = async (req,res,next) => {
-    try {
-        
-        const newUser = new UserModel(req.body)
-     
-        const {_id} = await newUser.save()
+export const registerUser: RequestHandler = async (req, res, next) => {
+  try {
+    const newUser = new UserModel(req.body);
 
-        res.status(201).send({_id})
+    const { _id } = await newUser.save();
 
-    } catch (error) {
+    res.status(201).send({ _id });
+  } catch (error) {
+    next(error);
+  }
+};
 
-        next(error)
-        
+export const loginUser: RequestHandler = async (req, res, next) => {
+  try {
+    const user = await UserModel.checkCredentials(
+      req.body.email,
+      req.body.password
+    );
+
+    if (user) {
+      const token = await createAccessToken({ _id: user._id });
+      res.send(token);
+    } else {
+      next(
+        createHttpError(
+          401,
+          `Unauthorized, please provide matching credentials`
+        )
+      );
     }
-}
- export const loginUser: RequestHandler = async (req,res,next) => {
-    try {
-        
-    } catch (error) {
-        
-    }
- }
-export const sendNewTokens: RequestHandler = async (req,res,next) => {
-    try {
-        
-    } catch (error) {
-        
-    }
-}
-export const updateUser: RequestHandler = async (req:IUserRequest,res,next) => {
-    try {
-        
-        const updatedUser = UserModel.findByIdAndUpdate(req.user?._id, req.body, {new:true,runValidators:true})
+  } catch (error) {
+    next(error);
+  }
+};
 
-        if(!updateUser) {
-            next(createHttpError(404, `User with id: ${req.user?._id} not found`))
-        } else {
-            res.status(204).send(updatedUser)
-        }
-    } catch (error) {
-        next(error)
-    }
-}
+export const sendNewTokens: RequestHandler = async (req, res, next) => {
+  try {
+  } catch (error) {}
+};
 
-export const addAvatar: RequestHandler = async (req,res,next) => {
-    try {
-        
-    } catch (error) {
-        
-    }
-}
-export const logoutUser: RequestHandler = async (req,res,next) => {
-    try {
-        
-    } catch (error) {
-        
-    }
-}
-export const getUsers: RequestHandler = async (req,res,next) => {
-    try {
+export const updateUser: RequestHandler = async (
+  req: IUserRequest,
+  res,
+  next
+) => {
+  try {
+    const updatedUser = await UserModel.findByIdAndUpdate(req.user?._id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
-        const users = await UserModel.find()
-
-        res.send(users)
-        
-    } catch (error) {
-        next(error)
+    if (!updateUser) {
+      next(createHttpError(404, `User with id: ${req.user?._id} not found`));
+    } else {
+      res.status(204).send(updatedUser);
     }
-}
-export const getMe: RequestHandler = async (req : IUserRequest,res,next) => {
-    try {
+  } catch (error) {
+    next(error);
+  }
+};
 
-        const me = await UserModel.findById(req.user?._id)
+export const addAvatar: RequestHandler = async (req: IUserRequest, res, next) => {
+  try {
+      const user = await UserModel.findByIdAndUpdate(req.user?._id,{ avatar: req.file?.path}, {new:true, runValidators:true})
 
-        if(!me) {
-            next(createHttpError(404,`user with id:$${req.user?._id} not found`))
-        } else {
-            res.send(me)
-        }
-        
-    } catch (error) {
-        next(error)
-        
+      if (!user) {
+         next(createHttpError(404, `Post with id: ${req.params.postId} not found`)) }
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const logoutUser: RequestHandler = async (req, res, next) => {
+  try {
+  } catch (error) {}
+};
+
+export const getUsers: RequestHandler = async (req, res, next) => {
+  try {
+    const users = await UserModel.find();
+
+    res.send(users);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMe: RequestHandler = async (req: IUserRequest, res, next) => {
+  try {
+    const me = await UserModel.findById(req.user?._id);
+
+    if (!me) {
+      next(createHttpError(404, `user with id:${req.user?._id} not found`));
     }
-}
-export const getUserById: RequestHandler = async (req,res,next) => {
-    try { 
+    res.send(me);
+  } catch (error) {
+    next(error);
+  }
+};
 
-        const user = await UserModel.findById(req.params.id)
-        if(!user) {
-            next(createHttpError(404,`user with id:$${req.params.id} not found`))
-        } else {
-            res.send(user)
-        }
-        
-    } catch (error) {
-        next(error)
-        
+export const getUserById: RequestHandler = async (req, res, next) => {
+  try {
+    const user = await UserModel.findById(req.params.id);
+    if (!user) {
+      next(createHttpError(404, `user with id:$${req.params.id} not found`));
+    } else {
+      res.send(user);
     }
-}
+  } catch (error) {
+    next(error);
+  }
+};

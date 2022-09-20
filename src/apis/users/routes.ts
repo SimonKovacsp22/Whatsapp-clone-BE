@@ -1,5 +1,7 @@
 import express from "express"
 import {registerUser, loginUser, sendNewTokens, updateUser, logoutUser, getUsers, getMe, getUserById, addAvatar} from "./index"
+import { JWTAuthMiddleware } from "../../lib/JWTMiddleware"
+import {} from "../../lib/fileUpload.js"
 
 
 const userRouter = express.Router()
@@ -13,13 +15,13 @@ userRouter.post("/me/avatar", addAvatar)
 
 userRouter.post("/session/refresh", sendNewTokens )
 
-userRouter.put("/me", updateUser)
+userRouter.put("/me",JWTAuthMiddleware,updateUser)
 
 userRouter.delete("/session", logoutUser)
 
 userRouter.get("/", getUsers)
 
-userRouter.get("/me", getMe)
+userRouter.get("/me",JWTAuthMiddleware, getMe)
 
 userRouter.get("/:id", getUserById)
 
