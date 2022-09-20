@@ -25,7 +25,7 @@ export const loginUser: RequestHandler = async (req, res, next) => {
 
     if (user) {
       const token = await createAccessToken({ _id: user._id });
-      res.send(token);
+      res.send({ token });
     } else {
       next(
         createHttpError(
@@ -41,10 +41,10 @@ export const loginUser: RequestHandler = async (req, res, next) => {
 
 export const sendNewTokens: RequestHandler = async (req, res, next) => {
   try {
-  } catch (error) {}
+  } catch (error) { }
 };
 
-export const updateUser: RequestHandler = async ( req: IUserRequest, res, next) => {
+export const updateUser: RequestHandler = async (req: IUserRequest, res, next) => {
   try {
     const updatedUser = await UserModel.findByIdAndUpdate(req.user?._id, req.body, {
       new: true,
@@ -64,12 +64,13 @@ export const updateUser: RequestHandler = async ( req: IUserRequest, res, next) 
 export const addAvatar: RequestHandler = async (req: IUserRequest, res, next) => {
   try {
     console.log(req.file)
-      const user = await UserModel.findByIdAndUpdate(req.user?._id,{ avatar: req.file?.path}, {new:true, runValidators:true})
+    const user = await UserModel.findByIdAndUpdate(req.user?._id, { avatar: req.file?.path }, { new: true, runValidators: true })
 
-      if (!user) {
-         next(createHttpError(404, `Post with id: ${req.params.postId} not found`)) }
+    if (!user) {
+      next(createHttpError(404, `Post with id: ${req.params.postId} not found`))
+    }
 
-         res.send(user)
+    res.send(user)
   } catch (error) {
     next(error)
   }
@@ -77,7 +78,7 @@ export const addAvatar: RequestHandler = async (req: IUserRequest, res, next) =>
 
 export const logoutUser: RequestHandler = async (req, res, next) => {
   try {
-  } catch (error) {}
+  } catch (error) { }
 };
 
 export const getUsers: RequestHandler = async (req, res, next) => {
