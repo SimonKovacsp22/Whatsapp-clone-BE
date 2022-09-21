@@ -22,6 +22,7 @@ export const loginUser: RequestHandler = async (req, res, next) => {
       req.body.email,
       req.body.password
     );
+    console.log(user)
 
     if (user) {
       const token = await createAccessToken({ _id: user._id });
