@@ -25,7 +25,7 @@ export const loginUser: RequestHandler = async (req, res, next) => {
 
     if (user) {
       const token = await createAccessToken({ _id: user._id });
-      res.send(token);
+      res.send({token});
     } else {
       next(
         createHttpError(

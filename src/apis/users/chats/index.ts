@@ -15,8 +15,10 @@ export const createChat:RequestHandler = async (req: IUserRequest, res, next) =>
     // } else {
         const newChat = new ChatModel()
 
-        newChat.members = [...req.body.recipient, req.user?._id]
- 
+        newChat.members = [ req.user?._id,...req.body.recipient,]
+
+        newChat.memberIds = [ req.user?._id,...req.body.recipient,]
+
         const {members} = await newChat.save()
  
         res.status(201).send(members)
@@ -31,11 +33,19 @@ export const createChat:RequestHandler = async (req: IUserRequest, res, next) =>
 export const getMyChats : RequestHandler = async (req:IUserRequest , res, next) => {
     try {
 
-        const chats = await ChatModel.find()
+        const chats = await ChatModel.find().populate({
+          path: 'members',
+          select:
+            'username email avatar'
+        }).populate({  path: 'messages',
+        select:
+          'sender content.text'})
 
-        const myChats = chats.filter( chat => chat.members.includes(req.user?._id))
+         const myChats = chats.filter( chat => chat.memberIds.includes(req.user?._id))
+
         
-        res.send(myChats)
+        
+        res.send({MyChats:myChats})
 
     } catch (error) {
         next(error)
