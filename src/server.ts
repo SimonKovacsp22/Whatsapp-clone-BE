@@ -6,6 +6,7 @@ import cors from "cors";
 import { Server } from "socket.io";
 import userRouter from "./apis/users/routes";
 import chatRouter from "./apis/users/chats/routes";
+import filesRouter from "./apis/files/index";
 import { badRequestHandler, forbiddenErrorHandler, genericServerErrorHandler, notFoundHandler, unauthorizedHandler } from "./lib/errorHandlers";
 
 
@@ -21,6 +22,7 @@ expressServer.use(express.json())
 
 expressServer.use("/users", userRouter)
 expressServer.use("/chat", chatRouter)
+expressServer.use("/files", filesRouter)
 
 
 expressServer.use(badRequestHandler)
