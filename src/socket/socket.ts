@@ -6,21 +6,18 @@ export const newConnectionHandler = (socket) => {
 
   const id = socket.handshake.query.id
   const chatId = socket.handshake.query.chatId
-  socket.join(id)
+  socket.join(chatId)
+  
+
+  
 
   socket.on("send-message", async ({recipients, text}) => {
     const message = new MessageModel({sender: id, content: {text: text, media: ''}})
     const {_id} = await message.save()
     const chat = await ChatModel.findByIdAndUpdate(chatId,{ $push: { messages: _id}})
     
-
-    console.log(text)
-    console.log(recipients)
-    recipients.forEach(recipient => {
-      socket.broadcast.to(recipient).emit('receive-message', {
-        recipients, sender:id, text
-      })
-    })
+    socket.broadcast.to(chatId).emit("recieve-message",{sender: id, content: {text: text, media: ''}})
+    
   })
 
   
