@@ -16,13 +16,13 @@ export const createChat: RequestHandler = async (req: IUserRequest, res, next) =
     // } else {
     const newChat = new ChatModel()
 
-        newChat.members = [ req.user?._id,...req.body.recipient,]
+    newChat.members = [req.user?._id, ...req.body.recipient,]
 
-        newChat.memberIds = [ req.user?._id,...req.body.recipient,]
+    newChat.memberIds = [req.user?._id, ...req.body.recipient,]
 
-        const {members} = await newChat.save()
- 
-        res.status(201).send(members)
+    const { members } = await newChat.save()
+
+    res.status(201).send(members)
     // }
 
 
@@ -34,19 +34,21 @@ export const createChat: RequestHandler = async (req: IUserRequest, res, next) =
 export const getMyChats: RequestHandler = async (req: IUserRequest, res, next) => {
   try {
 
-        const chats = await ChatModel.find().populate({
-          path: 'members',
-          select:
-            'username email avatar'
-        }).populate({  path: 'messages',
-        select:
-          'sender content.text'})
+    const chats = await ChatModel.find().populate({
+      path: 'members',
+      select:
+        'username email avatar'
+    }).populate({
+      path: 'messages',
+      select:
+        'sender content.text'
+    })
 
-         const myChats = chats.filter( chat => chat.memberIds.includes(req.user?._id))
+    const myChats = chats.filter(chat => chat.memberIds.includes(req.user?._id))
 
-        
-        
-        res.send({MyChats:myChats})
+
+
+    res.send({ MyChats: myChats })
 
     res.send(myChats)
 
@@ -55,17 +57,19 @@ export const getMyChats: RequestHandler = async (req: IUserRequest, res, next) =
   }
 }
 
-export const getMessageHistory : RequestHandler = async (req, res, next) => {
-    try {
+export const getMessageHistory: RequestHandler = async (req, res, next) => {
+  try {
 
-      const chat = await ChatModel.findById(req.params.id).populate({  path: 'messages',
+    const chat = await ChatModel.findById(req.params.id).populate({
+      path: 'messages',
       select:
-        'sender content.text'})
-        
-      if(!chat) next(createHttpError(404,` chat with id:${req.params.id} not found`))
+        'sender content.text'
+    })
 
-      res.send(chat)
-    } catch (error) {
-        next(error)
-    }
+    if (!chat) next(createHttpError(404, ` chat with id:${req.params.id} not found`))
+
+    res.send(chat)
+  } catch (error) {
+    next(error)
+  }
 }
