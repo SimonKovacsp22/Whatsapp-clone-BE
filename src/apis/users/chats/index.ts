@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { RequestHandler } from "express";
 import ChatModel from "./model"
 import { IUserRequest } from "../../../lib/JWTMiddleware";
+import createHttpError from "http-errors";
 
 
 export const createChat:RequestHandler = async (req: IUserRequest, res, next) => {
@@ -54,7 +55,14 @@ export const getMyChats : RequestHandler = async (req:IUserRequest , res, next) 
 
 export const getMessageHistory : RequestHandler = async (req, res, next) => {
     try {
+
+      const chat = await ChatModel.findById(req.params.id).populate({  path: 'messages',
+      select:
+        'sender content.text'})
         
+      if(!chat) next(createHttpError(404,` chat with id:${req.params.id} not found`))
+
+      res.send(chat)
     } catch (error) {
         next(error)
     }
