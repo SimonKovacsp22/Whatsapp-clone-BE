@@ -4,23 +4,31 @@ import MessageModel from "../apis/users/messages/model"
 
 export const newConnectionHandler = (socket) => {
 
-  const id = socket.handshake.query.id
-  const chatId = socket.handshake.query.chatId
-  socket.join(chatId)
+  console.log(`user connected: ${socket.id}`)
   
+  socket.on("join_room", (data) => {
+    socket.join(data);
+    console.log(`User with ID: ${socket.id} joined room: ${data}`);
+  });
 
-  
-
-  socket.on("send-message", async ({recipients, text}) => {
-    const message = new MessageModel({sender: id, content: {text: text, media: ''}})
+  socket.on("send_message",async  (data) => {
+    const message = new MessageModel({sender: data.sender, content: {text: data.text, media: ''}})
     const {_id} = await message.save()
-    const chat = await ChatModel.findByIdAndUpdate(chatId,{ $push: { messages: _id}})
+    const chat = await ChatModel.findByIdAndUpdate(data.room,{ $push: { messages: _id}})
     
-    socket.broadcast.to(chatId).emit("recieve-message",{sender: id, content: {text: text, media: ''}})
-    
-  })
 
-  
+    socket.to(data.room).emit("receive_message", data);
+   
 
-  
+
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User Disconnected", socket.id);
+  });
 };
+ 
+
+  
+
+  

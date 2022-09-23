@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { RequestHandler } from "express";
 import ChatModel from "./model"
+import MessageModel from "../messages/model"
 import { IUserRequest } from "../../../lib/JWTMiddleware";
 import createHttpError from "http-errors";
 
@@ -38,9 +39,7 @@ export const getMyChats : RequestHandler = async (req:IUserRequest , res, next) 
           path: 'members',
           select:
             'username email avatar'
-        }).populate({  path: 'messages',
-        select:
-          'sender content.text'})
+        }).populate("messages")
 
          const myChats = chats.filter( chat => chat.memberIds.includes(req.user?._id))
 
@@ -56,9 +55,7 @@ export const getMyChats : RequestHandler = async (req:IUserRequest , res, next) 
 export const getMessageHistory : RequestHandler = async (req, res, next) => {
     try {
 
-      const chat = await ChatModel.findById(req.params.id).populate({  path: 'messages',
-      select:
-        'sender content.text'})
+      const chat = await ChatModel.findById(req.params.id).populate('messages')
         
       if(!chat) next(createHttpError(404,` chat with id:${req.params.id} not found`))
 
